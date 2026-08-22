@@ -2,6 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<!-- 隠す指定は .js-ready の内側にしか書かない。JSが死んでも本文が消えないように -->
+<script>document.documentElement.classList.add("js-ready");</script>
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>炭火焼鳥と日本酒 とり藍(とりあい)| 中目黒 ※デモサイト</title>
@@ -92,6 +94,13 @@
     --fs-num: 26px;
     --fs-display: clamp(30px, 3.4vw, 46px);
     --header-h: 63px;
+    /* 動きのトークン。1サイトで使うeasingは3種まで。
+       register は静（明朝・八席・藍）なので出現は 600–900ms に収める */
+    --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);   /* 出現 */
+    --ease-inout-quart: cubic-bezier(0.77, 0, 0.175, 1);    /* 書き下ろし・罫線 */
+    --d-rise: 800ms;   /* 見出しのせり上がり */
+    --d-fade: 700ms;   /* 本文・写真の出現 */
+    --d-write: 900ms;  /* 縦組みキャッチの書き下ろし。静の上限に合わせる */
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -142,7 +151,10 @@
   .mobile-bar .rsv { --focus: var(--koji); }
   .mobile-bar .tel { --focus: var(--ai-koi); }
   .btn-reserve, .reserve-form button, .mobile-bar a, .nav-toggle {
-    transition: transform 0.08s ease, background-color 0.2s ease, border-color 0.2s ease;
+    /* 押下の返しと色替えだけ。色は linear（曲線を付けると色が濁って見える）。
+       easing はサイト全体で3種まで＝out-quart / inout-quart / linear */
+    transition: transform 80ms var(--ease-out-quart),
+                background-color 200ms linear, border-color 200ms linear;
   }
   .btn-reserve:active, .reserve-form button:active, .mobile-bar a:active, .nav-toggle:active { transform: scale(0.985); }
 
@@ -356,12 +368,87 @@
   /* ---------- モバイル固定バー ---------- */
   .mobile-bar { display: none; }
 
-  /* ---------- スクロール出現(純フェードのみ) ---------- */
-  .fade { opacity: 0; transition: opacity 0.6s ease-out; }
-  .fade.in { opacity: 1; }
+  /* ---------- 出現 ----------
+     コンセプトの1語は「呼吸」（キャッチ＝串一本に、炭の呼吸を。）。
+     register は静なので、出現は 600–900ms、常時動くものは象徴ひとつだけ（炭の熾き）。
+
+     隠す指定は必ず .js-ready の内側に書く。素のCSSに opacity:0 を書くと、
+     JSが死んだときに本文16要素がそのまま消える（直前までこの状態だった）。 */
+
+  /* 本文・写真・カード: フェード＋わずかな上昇。脇役の出現 */
+  .js-ready .fade {
+    opacity: 0; transform: translate3d(0, 14px, 0);
+    transition: opacity var(--d-fade) var(--ease-out-quart),
+                transform var(--d-fade) var(--ease-out-quart);
+    transition-delay: var(--d, 0ms);
+  }
+  .js-ready .fade.in { opacity: 1; transform: none; }
+
+  /* 節見出し: マスク内せり上がり。主役の出現なので、脇役と別の動きにする
+     （全要素が同じフェードだと「同型」＝AI感の指紋になる） */
+  .sec-label h2 { overflow: hidden; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+  .js-ready .sec-label h2 > span {
+    display: inline-block;
+    transform: translate3d(0, 108%, 0);
+    transition: transform var(--d-rise) var(--ease-out-quart);
+  }
+  .js-ready .sec-label.in h2 > span { transform: translate3d(0, 0, 0); }
+
+  /* 見出しの右へ伸びる罫線。見出しが立ってから引かれる（同時に動かさない） */
+  .js-ready .menu-section .sec-label::after,
+  .js-ready .access-section .sec-label::after {
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 900ms var(--ease-inout-quart) 260ms;
+  }
+  .js-ready .menu-section .sec-label.in::after,
+  .js-ready .access-section .sec-label.in::after { transform: scaleX(1); }
+
+  /* 三つの約束は3枚とも同時に出すと壁になる。120msずつずらす */
+  .kodawari:nth-child(2) { --d: 120ms; }
+  .kodawari:nth-child(3) { --d: 240ms; }
+
+  /* ヒーロー: 縦組みのキャッチは上から書き下ろす（筆の向き）。
+     せり上がりだと縦組みの読み順と逆になる */
+  .js-ready .hero-catch {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path var(--d-write) var(--ease-inout-quart) 120ms;
+  }
+  .js-ready .hero.in .hero-catch { clip-path: inset(0 0 0 0); }
+  .js-ready .hero-sub h1,
+  .js-ready .hero-sub p {
+    opacity: 0; transform: translate3d(0, 12px, 0);
+    transition: opacity var(--d-fade) var(--ease-out-quart),
+                transform var(--d-fade) var(--ease-out-quart);
+  }
+  .js-ready .hero-sub h1 { transition-delay: 620ms; }
+  .js-ready .hero-sub p  { transition-delay: 760ms; }
+  .js-ready .hero.in .hero-sub h1,
+  .js-ready .hero.in .hero-sub p { opacity: 1; transform: none; }
+
+  /* 常時動くものはこれ1つだけ。炭の熾きが72秒で一往復する＝ほぼ気づかない速さ。
+     気づかない速さが「生きている」質感を作る。速い常時アニメはAI感の典型 */
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(58% 40% at 52% 75%,
+                rgba(232, 160, 32, 0.34), rgba(232, 160, 32, 0) 72%);
+    opacity: 0.3;
+    animation: sumi-iki 72s var(--ease-inout-quart) infinite;
+  }
+  @keyframes sumi-iki {
+    0%, 100% { opacity: 0.26; }
+    50%      { opacity: 0.60; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .fade { opacity: 1; transition: none; }
+    .js-ready .fade,
+    .js-ready .hero-sub h1,
+    .js-ready .hero-sub p { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .js-ready .sec-label h2 > span { transform: none !important; transition: none !important; }
+    .js-ready .menu-section .sec-label::after,
+    .js-ready .access-section .sec-label::after { transform: none !important; transition: none !important; }
+    .js-ready .hero-catch { clip-path: none !important; transition: none !important; }
+    .hero::after { animation: none; opacity: 0.4; }
   }
 
   /* ---------- responsive ---------- */
@@ -379,6 +466,11 @@
     .nav a { padding: 13px 4px; border-bottom: 1px dotted var(--line); font-size: 15px; }
     .nav .btn-reserve { margin-top: var(--sp-2); padding: 12px 22px; text-align: center; border-bottom: 1px solid var(--koji); }
     .hero { min-height: 100svh; align-content: start; padding-top: calc(var(--header-h) + 4vh); }
+    /* 縦画面は火が下1/4に来るので、呼吸の中心も下げる */
+    .hero::after {
+      background: radial-gradient(62% 26% at 50% 88%,
+                  rgba(232, 160, 32, 0.34), rgba(232, 160, 32, 0) 72%);
+    }
     /* 縦画面は火が下1/4・闇が上3/4。文字は全部その闇に乗る */
     .hero-bg img { filter: brightness(.86); }
     .hero::before {
@@ -480,7 +572,7 @@
   <!-- こだわり -->
   <section id="kodawari">
     <div class="container">
-      <div class="sec-label fade"><h2>三つの約束</h2></div>
+      <div class="sec-label fade"><h2><span>三つの約束</span></h2></div>
       <div class="kodawari-grid">
         <article class="kodawari fade">
           <img loading="lazy"
@@ -520,7 +612,7 @@
   <!-- お品書き -->
   <section id="menu" class="menu-section">
     <div class="container">
-      <div class="sec-label fade"><h2>お品書き</h2></div>
+      <div class="sec-label fade"><h2><span>お品書き</span></h2></div>
       <div class="menu-grid">
         <div class="fade">
           <div class="course">
@@ -580,7 +672,7 @@
   <!-- 店について -->
   <section id="about" class="about-section">
     <div class="container">
-      <div class="sec-label fade"><h2>店について</h2></div>
+      <div class="sec-label fade"><h2><span>店について</span></h2></div>
       <div class="about-grid">
         <div class="about-text fade">
           <p>とり藍は、店主夫婦二人で営む八席の焼鳥店です。大きな声も、大きなメニューもありません。あるのは炭の音と、その日の串、そして店主が惚れ込んだ酒だけ。</p>
@@ -602,7 +694,7 @@
   <!-- 予約・アクセス -->
   <section id="access" class="access-section">
     <div class="container">
-      <div class="sec-label fade"><h2>ご予約・アクセス</h2></div>
+      <div class="sec-label fade"><h2><span>ご予約・アクセス</span></h2></div>
       <div class="access-grid">
         <div class="fade" id="reserve">
           <p class="tel-label">お電話でのご予約(15:00以降)</p>
@@ -709,11 +801,48 @@
 </nav>
 
 <script>
-  // スクロール出現(純フェード)
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: 0.05 });
-  document.querySelectorAll('.fade').forEach(el => io.observe(el));
+  // スクロール出現。役割ごとに動きが違うので、JSは .in を付けるだけにして
+  // 「何がどう動くか」は全部CSSに置く（尺・easing・遅延を1か所で見られるようにする）
+  // ヒーローは最初から画面にあるので、交差の判定を待つ理由がない。
+  // 待たせると、IOが遅れた分だけキャッチが消えたままになる。初回体験は load で始める。
+  const hero = document.querySelector('.hero');
+  if (hero) {
+    // 初期状態が一度描かれてから外す（同じフレームで外すと遷移が走らない）。
+    // rAF は描画が止まる環境で発火しないので、setTimeout も並べる。二度付けても害はない。
+    const showHero = () => hero.classList.add('in');
+    requestAnimationFrame(showHero);
+    setTimeout(showHero, 120);
+  }
+
+  const animTargets = document.querySelectorAll('.fade');
+  let ioFired = false;
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      ioFired = true;
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.05 });
+    animTargets.forEach(el => io.observe(el));
+
+    // 保険。IntersectionObserver が「存在するのに一度も配信されない」環境がある
+    // （描画が止まる埋め込みブラウザ・強い省電力など）。そこでは本文が透明のまま残る。
+    // 一度でも発火していれば何もしない ── 無条件に発動させると出現アニメを全部潰す。
+    // 裏で読み込まれた場合は表に出るまで待つ。
+    const revealAll = () => animTargets.forEach(el => el.classList.add('in'));
+    const safetyNet = () => {
+      if (ioFired) return;
+      if (document.visibilityState === 'hidden') {
+        document.addEventListener('visibilitychange', function onShow() {
+          document.removeEventListener('visibilitychange', onShow);
+          setTimeout(safetyNet, 1500);
+        });
+        return;
+      }
+      revealAll();
+    };
+    setTimeout(safetyNet, 6000);
+  } else {
+    animTargets.forEach(el => el.classList.add('in'));
+  }
 
   // モバイルナビ開閉
   const header = document.querySelector('.header');
