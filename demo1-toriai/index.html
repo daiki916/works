@@ -354,7 +354,13 @@
 
   /* ---------- footer ---------- */
   footer { background: var(--ai-yoru); color: rgba(242, 239, 231, 0.88); padding: var(--sp-6); text-align: center; font-size: var(--fs-sm); border-top: 1px solid rgba(242, 239, 231, 0.15); }
+  /* 1080px は「本文の器の幅」であって行長の上限ではない。実測では住所行が74字、
+     デモ注記が85字あった。和文が読めるのは1行25〜40字で、40字を超えると
+     目が行頭に戻れなくなる。em はそのまま字数になるので em で切る（ch は「0」の幅なので和文では無意味）。
+     短い行だから大丈夫、はフッターでいちばんよく外す */
   footer p { max-width: 1080px; margin-inline: auto; }
+  footer .finfo { max-width: 38em; }
+  footer .demo-note { max-width: 34em; }   /* 小さい字ほど短く */
     footer .fbrand { font-family: var(--serif); font-weight: 600; font-size: var(--fs-body); letter-spacing: var(--ls-title); margin-bottom: var(--sp-2); color: #F2EFE7; }
   /* 住所・電話・営業時間は単位ごとに不可分。折るなら単位の間で折る */
     footer .finfo span { white-space: nowrap; display: inline-block; }
