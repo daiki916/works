@@ -1,10 +1,12 @@
 import { cp, mkdir, rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sanitizeDemo3Html } from './sanitize-demo3.mjs';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const publicRoot = join(projectRoot, 'public');
 const entries = [
+  '_headers',
   'index.html',
   'robots.txt',
   'assets',
@@ -24,3 +26,5 @@ for (const entry of entries) {
     recursive: true,
   });
 }
+
+await sanitizeDemo3Html(join(publicRoot, 'demo3-shoku', 'index.html'));

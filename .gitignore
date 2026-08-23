@@ -10,6 +10,7 @@
 !/next.config.ts
 !/tsconfig.json
 !/vite.config.ts
+!/_headers
 !/index.html
 !/robots.txt
 !/assets/
