@@ -601,7 +601,9 @@ section { padding-block: var(--sp-x); }
 .shigoto-no { font-family: var(--mono); font-size: var(--fs-note); letter-spacing: .16em; color: var(--ao); padding-top: 6px; }
 .shigoto-item h3 { font-size: var(--fs-h3); margin-bottom: var(--sp-s); }
 .shigoto-item p { color: var(--usu); max-width: 44ch; }
-.shigoto-item p + p { margin-top: .9em; }
+/* 段落間は他所が 12px(--sp-s)なのに、ここだけ .9em=13.5px だった。
+   2pxの差は見えないが、同じ役割に2つの値を持つと次に触る人が迷う */
+.shigoto-item p + p { margin-top: var(--sp-s); }
 .shigoto-item .quote {
   margin-top: var(--sp-s); padding-left: var(--sp-m);
   border-left: 2px solid var(--kei); font-family: var(--mincho); color: var(--sumi);

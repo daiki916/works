@@ -200,7 +200,9 @@
   h2.midashi.in { animation: petan 0.24s cubic-bezier(0.2, 1.5, 0.4, 1) backwards; }
 
   /* ---------- 本日のおすすめ(短冊) ---------- */
-  .osusume { background: var(--kon); color: var(--shiro); padding: var(--sp-8) 0 var(--sp-10); background-image: radial-gradient(rgba(255, 248, 232, 0.06) 1px, transparent 1px); background-size: 22px 22px; }
+  /* 節の上下は 80/80 でそろえる。ここだけ上が64pxで、ヒーローとの間が
+     他の節間(160px)より32px狭かった。同じ役割の余白は同じ値にする */
+  .osusume { background: var(--kon); color: var(--shiro); padding: var(--sp-10) 0; background-image: radial-gradient(rgba(255, 248, 232, 0.06) 1px, transparent 1px); background-size: 22px 22px; }
   .tanzaku-row { display: flex; justify-content: center; gap: var(--sp-4); flex-wrap: wrap; }
   .tanzaku {
     writing-mode: vertical-rl; text-orientation: upright;
