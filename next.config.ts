@@ -45,12 +45,16 @@ const nextConfig: NextConfig = {
           destination: '/_published/assets/:path*',
         },
         ...staticPages.map((page) => ({
+          source: `/${page}/index.html`,
+          destination: `/_published/${page}.html`,
+        })),
+        ...staticPages.map((page) => ({
           source: `/${page}/:path*`,
           destination: `/_published/${page}/:path*`,
         })),
         {
           source: '/index.html',
-          destination: '/_published/index.html',
+          destination: '/_published/root.html',
         },
         {
           source: '/robots.txt',

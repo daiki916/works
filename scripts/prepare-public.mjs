@@ -6,6 +6,14 @@ import { sanitizeDemo3Html } from './sanitize-demo3.mjs';
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const publicRoot = join(projectRoot, 'public');
 const publishedRoot = join(publicRoot, '_published');
+const staticPages = [
+  'noren',
+  'demo1-toriai',
+  'demo2-marukin',
+  'demo3-shoku',
+  'demo4-sugito',
+  'demo5-kobiki',
+];
 const entries = [
   'index.html',
   'robots.txt',
@@ -28,4 +36,18 @@ for (const entry of entries) {
   });
 }
 
-await sanitizeDemo3Html(join(publishedRoot, 'demo3-shoku', 'index.html'));
+await cp(
+  join(publishedRoot, 'index.html'),
+  join(publishedRoot, 'root.html'),
+);
+await rm(join(publishedRoot, 'index.html'));
+
+for (const page of staticPages) {
+  await cp(
+    join(publishedRoot, page, 'index.html'),
+    join(publishedRoot, `${page}.html`),
+  );
+  await rm(join(publishedRoot, page, 'index.html'));
+}
+
+await sanitizeDemo3Html(join(publishedRoot, 'demo3-shoku.html'));
