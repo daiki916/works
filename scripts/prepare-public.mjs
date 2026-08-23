@@ -38,16 +38,16 @@ for (const entry of entries) {
 
 await cp(
   join(publishedRoot, 'index.html'),
-  join(publishedRoot, 'root.html'),
+  join(publishedRoot, 'root.payload'),
 );
 await rm(join(publishedRoot, 'index.html'));
 
 for (const page of staticPages) {
   await cp(
     join(publishedRoot, page, 'index.html'),
-    join(publishedRoot, `${page}.html`),
+    join(publishedRoot, `${page}.payload`),
   );
   await rm(join(publishedRoot, page, 'index.html'));
 }
 
-await sanitizeDemo3Html(join(publishedRoot, 'demo3-shoku.html'));
+await sanitizeDemo3Html(join(publishedRoot, 'demo3-shoku.payload'));

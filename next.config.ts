@@ -31,6 +31,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   async headers() {
     return [
+      ...staticPages.map((page) => ({
+        source: `/${page}/index.html`,
+        headers: [
+          ...securityHeaders,
+          { key: 'Content-Type', value: 'text/html; charset=utf-8' },
+        ],
+      })),
       {
         source: '/:path*',
         headers: securityHeaders,
@@ -46,7 +53,7 @@ const nextConfig: NextConfig = {
         },
         ...staticPages.map((page) => ({
           source: `/${page}/index.html`,
-          destination: `/_published/${page}.html`,
+          destination: `/_published/${page}.payload`,
         })),
         ...staticPages.map((page) => ({
           source: `/${page}/:path*`,
@@ -54,7 +61,7 @@ const nextConfig: NextConfig = {
         })),
         {
           source: '/index.html',
-          destination: '/_published/root.html',
+          destination: '/_published/root.payload',
         },
         {
           source: '/robots.txt',
