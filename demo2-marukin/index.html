@@ -66,8 +66,27 @@
     --gothic: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", sans-serif;
     --sp-1: 8px; --sp-2: 16px; --sp-3: 24px; --sp-4: 32px; --sp-6: 48px; --sp-8: 64px; --sp-10: 80px;
     --header-h: 60px;
+
+    /* 型スケール。直す前は 12/13/14/14.5/15/16/17/18/19/20/21/22/24 と並び、
+       14→14.5→15→16→17→18→19→20→21→22 が9段連続で比1.1未満だった。
+       見分けられない差を9つ作っていたということ。本文16pxを基準に畳む。
+       以後、新しい要素には必ずこの中から選ぶ。選べないなら役割が曖昧だということ。 */
+    --fs-cap:  12px;   /* 注記・免責・小さな添え字        比 1.17 */
+    --fs-note: 14px;   /* ラベル・キャプション・補助UI    比 1.14 */
+    --fs-body: 16px;   /* 本文・ナビ・フォーム            比 1.13 */
+    --fs-lead: 18px;   /* リード・ボタン・引用            比 1.17 */
+    --fs-h3:   21px;   /* 小見出し・屋号・短冊            比 1.33 */
+
+    /* 値段はこの店の主役なので、本文の段とは別系統にする。
+       大きな数字＋小さな単位で「主張」ではなく「事実」を作る役割 */
+    --fs-num:   26px;  /* 電話番号 */
+    --fs-num-l: 34px;  /* 宴会の価格・名物の値段 */
+    --fs-num-x: 46px;  /* 名物の筆頭（串カツ120円） */
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* 素の <small> はブラウザ既定の 0.833 倍になり、段の外に落ちる（実測 11.7px）。
+     個別に指定していない small を段に引き戻す */
+  small { font-size: var(--fs-cap); }
 
   /* 和文の折り返し: 語の途中で改行される中割れを防ぐ(文節単位で折る)。
      非対応ブラウザは無視するだけなので安全。 */
@@ -77,7 +96,7 @@
     position: relative;
     font-family: var(--gothic);
     color: var(--sumi); background: var(--kiji);
-    line-height: 1.8; font-size: 16px; letter-spacing: 0.03em;
+    line-height: 1.8; font-size: var(--fs-body); letter-spacing: 0.03em;
     background-image:
       repeating-linear-gradient(-45deg, rgba(33, 29, 26, 0.032) 0 1px, transparent 1px 7px),
       repeating-linear-gradient(12deg, rgba(33, 29, 26, 0.022) 0 1px, transparent 1px 11px);
@@ -92,7 +111,7 @@
 
   /* ---------- 共通部品 ---------- */
   .btn {
-    display: inline-block; font-family: var(--tegaki); font-size: 18px; text-decoration: none;
+    display: inline-block; font-family: var(--tegaki); font-size: var(--fs-lead); text-decoration: none;
     padding: 14px 26px; border: 2.5px solid var(--sumi); color: var(--shiro);
     box-shadow: var(--kage) var(--sumi); transition: transform 0.08s ease, box-shadow 0.08s ease;
   }
@@ -115,22 +134,22 @@
     display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-3);
     background: var(--kiji); border-bottom: 2.5px solid var(--sumi);
   }
-  .brand { font-family: var(--tegaki); font-size: 21px; color: var(--sumi); text-decoration: none; white-space: nowrap; }
-  .brand .maru { display: inline-block; width: 30px; height: 30px; background: var(--aka); color: var(--shiro); border-radius: 50%; text-align: center; line-height: 31px; font-size: 16px; margin-right: 8px; transform: rotate(-4deg); }
+  .brand { font-family: var(--tegaki); font-size: var(--fs-h3); color: var(--sumi); text-decoration: none; white-space: nowrap; }
+  .brand .maru { display: inline-block; width: 30px; height: 30px; background: var(--aka); color: var(--shiro); border-radius: 50%; text-align: center; line-height: 31px; font-size: var(--fs-body); margin-right: 8px; transform: rotate(-4deg); }
   .nav { display: flex; gap: var(--sp-3); align-items: center; }
-  .nav a { font-family: var(--tegaki); text-decoration: none; color: var(--sumi); font-size: 16px; }
+  .nav a { font-family: var(--tegaki); text-decoration: none; color: var(--sumi); font-size: var(--fs-body); }
   .nav a:hover { color: var(--aka); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; text-decoration-color: var(--kin); }
-  .nav .btn { padding: 10px 16px; font-size: 15px; min-height: 44px; }
-  .nav-toggle { display: none; font-family: var(--tegaki); background: var(--shiro); border: 2px solid var(--sumi); min-height: 44px; padding: 8px 14px; font-size: 15px; cursor: pointer; box-shadow: 2px 2px 0 var(--sumi); }
+  .nav .btn { padding: 10px 16px; font-size: var(--fs-note); min-height: 44px; }
+  .nav-toggle { display: none; font-family: var(--tegaki); background: var(--shiro); border: 2px solid var(--sumi); min-height: 44px; padding: 8px 14px; font-size: var(--fs-note); cursor: pointer; box-shadow: 2px 2px 0 var(--sumi); }
 
   /* ---------- hero ---------- */
   .hero { padding: calc(var(--header-h) + var(--sp-8)) 0 var(--sp-8); position: relative; overflow: hidden; }
   .hero .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--sp-6); align-items: center; }
   .hero-name { font-family: var(--tegaki); font-size: clamp(52px, 8vw, 88px); line-height: 1.15; letter-spacing: 0.04em; }
-  .hero-name small { display: block; font-size: 20px; letter-spacing: 0.3em; color: var(--aka); margin-bottom: 4px; }
+  .hero-name small { display: block; font-size: var(--fs-lead); letter-spacing: 0.3em; color: var(--aka); margin-bottom: 4px; }
   .hero-catch { font-family: var(--tegaki); font-size: clamp(20px, 2.6vw, 27px); margin: var(--sp-3) 0; border-bottom: 4px solid var(--aka); display: inline-block; padding-bottom: 4px; }
   .hero-badges { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin: var(--sp-3) 0 var(--sp-4); }
-  .hero-badges span { border: 2px solid var(--sumi); background: var(--shiro); padding: 5px 13px; font-size: 14px; font-weight: 500; box-shadow: 2px 2px 0 var(--sumi); }
+  .hero-badges span { border: 2px solid var(--sumi); background: var(--shiro); padding: 5px 13px; font-size: var(--fs-note); font-weight: 500; box-shadow: 2px 2px 0 var(--sumi); }
   .hero-cta { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
   /* 右半分が提灯4つだけで空いていた。提灯は74pxしかなく、88pxの店名の対抗馬にならず
      飾りにしか見えない。提灯を上に吊り、その下に名物の値段を札で貼って、
@@ -140,7 +159,7 @@
   .hero-fuda { list-style: none; width: 100%; max-width: 330px; }
   .hero-fuda li {
     display: flex; align-items: baseline; gap: 0;
-    font-family: var(--tegaki); font-size: 18px;
+    font-family: var(--tegaki); font-size: var(--fs-lead);
     background: var(--shiro); border: 2.5px solid var(--sumi);
     padding: 10px 16px; margin-bottom: 10px;
     box-shadow: var(--kage) var(--sumi);
@@ -149,15 +168,15 @@
   .hero-fuda li span { flex: 1; padding-right: 14px; }
   /* 大きな数字＋小さな単位。値段を「主張」ではなく「事実」として置く。
      「円」は数字にくっつける。離すと二つの要素に見えて、事実の density が落ちる */
-  .hero-fuda li b { font-size: 34px; font-weight: 400; line-height: 0.9; letter-spacing: 0.01em; }
-  .hero-fuda li small { font-size: 14px; margin-left: 3px; }
+  .hero-fuda li b { font-size: var(--fs-num-l); font-weight: 400; line-height: 0.9; letter-spacing: 0.01em; }
+  .hero-fuda li small { font-size: var(--fs-note); margin-left: 3px; }
   /* 名物の筆頭だけ一段大きく。この店でいちばん強い一行 */
-  .hero-fuda li:nth-child(1) { --r: -1.6deg; font-size: 20px; border-width: 3px; }
-  .hero-fuda li:nth-child(1) b { font-size: 46px; }
+  .hero-fuda li:nth-child(1) { --r: -1.6deg; font-size: var(--fs-lead); border-width: 3px; }
+  .hero-fuda li:nth-child(1) b { font-size: var(--fs-num-x); }
   .hero-fuda li:nth-child(2) { --r: 0.7deg; margin-left: 8px; }
   .hero-fuda li:nth-child(3) { --r: -0.7deg; margin-left: -4px; }
   .hero-fuda-note {
-    font-family: var(--gothic); font-size: 12px; letter-spacing: 0.06em;
+    font-family: var(--gothic); font-size: var(--fs-cap); letter-spacing: 0.06em;
     color: var(--sumi); opacity: 0.72; align-self: flex-end; margin: -14px 6px 0 0;
   }
 
@@ -185,28 +204,28 @@
   .tanzaku-row { display: flex; justify-content: center; gap: var(--sp-4); flex-wrap: wrap; }
   .tanzaku {
     writing-mode: vertical-rl; text-orientation: upright;
-    font-family: var(--tegaki); font-size: 24px; letter-spacing: 0.14em;
+    font-family: var(--tegaki); font-size: var(--fs-h3); letter-spacing: 0.14em;
     background: var(--shiro); color: var(--sumi);
     padding: 22px 16px; min-height: 240px; line-height: 1.4;
     border: 2.5px solid var(--sumi); box-shadow: var(--kage) var(--sumi);
     position: relative;
   }
-  .tanzaku b { font-size: 15px; font-family: var(--gothic); font-weight: 700; color: var(--sumi); letter-spacing: 0.2em; margin-block-start: 10px; }
+  .tanzaku b { font-size: var(--fs-note); font-family: var(--gothic); font-weight: 700; color: var(--sumi); letter-spacing: 0.2em; margin-block-start: 10px; }
   .tanzaku:nth-child(1) { transform: rotate(-2.5deg); background: var(--aka); color: var(--shiro); }
   .tanzaku:nth-child(1) b { color: var(--shiro); }
   .tanzaku:nth-child(2) { transform: rotate(1.5deg); margin-top: 14px; }
   .tanzaku:nth-child(3) { transform: rotate(-1deg) translateY(46px); background: var(--kin); margin-top: 5px; z-index: 5; }
-  .osusume .chui { text-align: center; margin-top: var(--sp-6); font-size: 14px; opacity: 0.85; }
+  .osusume .chui { text-align: center; margin-top: var(--sp-6); font-size: var(--fs-note); opacity: 0.85; }
 
   /* ---------- 名物メニュー(壁の品書き) ---------- */
   .menu-section { padding: var(--sp-10) 0; }
-  .menu-kokoro { font-family: var(--tegaki); font-size: 19px; margin: -20px 0 var(--sp-6); transform: rotate(-0.8deg); }
+  .menu-kokoro { font-family: var(--tegaki); font-size: var(--fs-lead); margin: -20px 0 var(--sp-6); transform: rotate(-0.8deg); }
   .menu-walls { display: grid; grid-template-columns: 1.3fr 1fr 0.8fr; gap: var(--sp-4); align-items: start; }
-  .fuda-group h3 { font-family: var(--tegaki); font-size: 22px; font-weight: 400; background: var(--sumi); color: var(--shiro); display: inline-block; padding: 3px 14px; margin-bottom: var(--sp-2); transform: rotate(-1deg); }
+  .fuda-group h3 { font-family: var(--tegaki); font-size: var(--fs-h3); font-weight: 400; background: var(--sumi); color: var(--shiro); display: inline-block; padding: 3px 14px; margin-bottom: var(--sp-2); transform: rotate(-1deg); }
   .fuda { list-style: none; }
   .fuda li {
     display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
-    font-family: var(--tegaki); font-size: 17px;
+    font-family: var(--tegaki); font-size: var(--fs-body);
     background: var(--shiro); border: 2px solid var(--sumi); padding: 9px 13px; margin-bottom: 9px;
     box-shadow: 2px 2px 0 rgba(33, 29, 26, 0.55);
   }
@@ -234,7 +253,8 @@
     }
     .fuda .ne { white-space: nowrap; font-variant-numeric: tabular-nums; }
   .fuda .meibutsu { background: var(--aka); color: var(--shiro); }
-  .menu-note { margin-top: var(--sp-4); font-size: 14px; }
+  /* 実測で1行42字。和文が読めるのは25〜40字。注記の類は max-width を入れ忘れる典型 */
+  .menu-note { margin-top: var(--sp-4); font-size: var(--fs-note); max-width: 36em; }
 
   /* ---------- 宴会 ---------- */
   .enkai { background: var(--aka); color: var(--shiro); padding: var(--sp-10) 0; }
@@ -242,22 +262,22 @@
   .enkai-card { background: var(--shiro); color: var(--sumi); border: 2.5px solid var(--sumi); box-shadow: var(--kage) var(--sumi); padding: var(--sp-4); }
   .enkai-card:nth-child(1) { transform: rotate(-1deg); }
   .enkai-card:nth-child(2) { transform: rotate(0.8deg); }
-  .enkai-card h3 { font-family: var(--tegaki); font-size: 21px; font-weight: 400; }
-  .enkai-card .en-price { font-family: var(--tegaki); font-size: 34px; color: var(--aka); margin: 6px 0 10px; font-variant-numeric: tabular-nums; }
-  .enkai-card .en-price small { font-size: 15px; color: var(--sumi); }
-  .enkai-card ul { list-style: none; font-size: 14.5px; }
+  .enkai-card h3 { font-family: var(--tegaki); font-size: var(--fs-h3); font-weight: 400; }
+  .enkai-card .en-price { font-family: var(--tegaki); font-size: var(--fs-num-l); color: var(--aka); margin: 6px 0 10px; font-variant-numeric: tabular-nums; }
+  .enkai-card .en-price small { font-size: var(--fs-note); color: var(--sumi); }
+  .enkai-card ul { list-style: none; font-size: var(--fs-note); }
   .enkai-card li { padding: 5px 0; border-bottom: 1px dashed rgba(33, 29, 26, 0.35); }
-  .enkai-card .cap { font-size: 14px; margin-top: 10px; }
-  .enkai .btn { font-size: 20px; }
+  .enkai-card .cap { font-size: var(--fs-note); margin-top: 10px; }
+  .enkai .btn { font-size: var(--fs-lead); }
 
   /* ---------- 店について ---------- */
   .about { padding: var(--sp-10) 0; }
   .about-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--sp-6); align-items: center; }
   .about p { margin-bottom: var(--sp-3); }
-  .about .oyaji { font-family: var(--tegaki); font-size: 17px; }
+  .about .oyaji { font-family: var(--tegaki); font-size: var(--fs-lead); }
   .about-photo { border: 2.5px solid var(--sumi); box-shadow: var(--kage) var(--sumi); transform: rotate(1.2deg); }
   .about-photo img { width: 100%; height: 340px; object-fit: cover; }
-  .about-photo figcaption { font-size: 14px; padding: 8px 12px; background: var(--shiro); border-top: 2px solid var(--sumi); font-family: var(--gothic); }
+  .about-photo figcaption { font-size: var(--fs-note); padding: 8px 12px; background: var(--shiro); border-top: 2px solid var(--sumi); font-family: var(--gothic); }
   .ph { position: relative; }
   .ph img { filter: grayscale(1) contrast(1.15); }
   .ph::after {
@@ -274,40 +294,41 @@
   /* ---------- アクセス・予約 ---------- */
   .access { background: var(--kon); color: #F5F2E6; padding: var(--sp-10) 0; }
   .access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
-  .info-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .info-table { width: 100%; border-collapse: collapse; font-size: var(--fs-note); }
   .info-table th, .info-table td { text-align: left; padding: 11px 8px; border-bottom: 1px solid rgba(245, 242, 230, 0.25); vertical-align: top; font-variant-numeric: tabular-nums; }
   .info-table th { font-family: var(--tegaki); font-weight: 400; white-space: nowrap; width: 6.5em; }
   .info-table a { color: #F5F2E6; }
   .map-frame { width: 100%; height: 240px; border: 2.5px solid var(--sumi); margin-top: var(--sp-2); }
-  .map-link { display: inline-block; margin-top: var(--sp-1); color: var(--kin); font-size: 14px; }
-  .oshirase { margin-top: var(--sp-3); font-size: 14px; border-left: 3px solid var(--kin); padding-left: 10px; }
+  .map-link { display: inline-block; margin-top: var(--sp-1); color: var(--kin); font-size: var(--fs-note); }
+  .oshirase { margin-top: var(--sp-3); font-size: var(--fs-note); border-left: 3px solid var(--kin); padding-left: 10px; }
   .tel-box { margin-bottom: var(--sp-3); }
-  .tel-box .tel { font-family: var(--tegaki); font-size: 26px; color: #F5F2E6; text-decoration: none; }
-  .tel-box .demo-tag { font-size: 14px; opacity: 0.8; margin-left: 8px; }
-  .tel-note { font-size: 14px; opacity: 0.9; margin-top: 2px; }
+  .tel-box .tel { font-family: var(--tegaki); font-size: var(--fs-num); color: #F5F2E6; text-decoration: none; }
+  .tel-box .demo-tag { font-size: var(--fs-note); opacity: 0.8; margin-left: 8px; }
+  .tel-note { font-size: var(--fs-note); opacity: 0.9; margin-top: 2px; }
   .reserve-form { margin-top: var(--sp-3); display: grid; gap: var(--sp-2); }
   .reserve-form .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); }
-  .reserve-form label { font-size: 14px; display: block; }
-  .reserve-form .opt { opacity: 0.75; font-size: 13px; }
+  .reserve-form label { font-size: var(--fs-note); display: block; }
+  .reserve-form .opt { opacity: 0.75; font-size: var(--fs-cap); }
   .reserve-form input, .reserve-form select, .reserve-form textarea {
     width: 100%; padding: 11px; border: 2px solid rgba(245, 242, 230, 0.5); background: rgba(245, 242, 230, 0.1);
-    color: #F5F2E6; font-family: var(--gothic); font-size: 16px; color-scheme: dark;
+    color: #F5F2E6; font-family: var(--gothic); font-size: var(--fs-body); color-scheme: dark;
   }
   .reserve-form textarea { min-height: 64px; resize: vertical; }
   .reserve-form button {
-    font-family: var(--tegaki); font-size: 18px; padding: 14px; cursor: pointer;
+    font-family: var(--tegaki); font-size: var(--fs-lead); padding: 14px; cursor: pointer;
     background: var(--kin); color: var(--sumi); border: 2.5px solid var(--sumi); box-shadow: var(--kage) var(--sumi);
     transition: transform 0.08s ease, box-shadow 0.08s ease;
   }
   .reserve-form button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--sumi); }
-  .form-policy { font-size: 14px; opacity: 0.85; line-height: 1.7; }
-  .form-done { border: 2.5px solid var(--kin); padding: var(--sp-3); font-size: 15px; background: rgba(232, 160, 32, 0.12); margin-bottom: var(--sp-2); }
+  .form-policy { font-size: var(--fs-note); opacity: 0.85; line-height: 1.7; }
+  .form-done { border: 2.5px solid var(--kin); padding: var(--sp-3); font-size: var(--fs-note); background: rgba(232, 160, 32, 0.12); margin-bottom: var(--sp-2); }
   .form-done:empty { display: none; }
 
   /* ---------- footer ---------- */
-  footer { background: var(--sumi); color: rgba(247, 245, 236, 0.9); padding: var(--sp-6) var(--sp-3); text-align: center; font-size: 14px; }
-  footer .fbrand { font-family: var(--tegaki); font-size: 19px; color: var(--kiji); margin-bottom: var(--sp-2); }
-  footer .demo-note { margin-top: var(--sp-2); opacity: 0.65; font-size: 13px; }
+  footer { background: var(--sumi); color: rgba(247, 245, 236, 0.9); padding: var(--sp-6) var(--sp-3); text-align: center; font-size: var(--fs-note); }
+  footer .fbrand { font-family: var(--tegaki); font-size: var(--fs-lead); color: var(--kiji); margin-bottom: var(--sp-2); }
+  /* 実測で1行49字。小さい字ほど短く切る */
+  footer .demo-note { margin-top: var(--sp-2); opacity: 0.65; font-size: var(--fs-cap); max-width: 34em; margin-inline: auto; }
 
   .mobile-bar { display: none; }
   /* 出現演出はJSが生きている時だけ。素の状態では全部見える */
@@ -339,11 +360,11 @@
     .chochin { width: 56px; }
     .menu-walls { grid-template-columns: 1fr; }
     .enkai-grid { grid-template-columns: 1fr; }
-    .tanzaku { min-height: 200px; font-size: 21px; }
+    .tanzaku { min-height: 200px; font-size: var(--fs-h3); }
     .about-photo img { height: 240px; }
     .reserve-form .pair { grid-template-columns: 1fr; }
     .mobile-bar { display: grid; grid-template-columns: 1fr 1fr; position: fixed; bottom: 0; left: 0; right: 0; z-index: 60; border-top: 2.5px solid var(--sumi); }
-    .mobile-bar a { display: block; text-align: center; padding: 15px 8px calc(15px + env(safe-area-inset-bottom)); font-family: var(--tegaki); font-size: 16px; text-decoration: none; }
+    .mobile-bar a { display: block; text-align: center; padding: 15px 8px calc(15px + env(safe-area-inset-bottom)); font-family: var(--tegaki); font-size: var(--fs-body); text-decoration: none; }
     .mobile-bar .tel { background: var(--kin); color: var(--sumi); }
     .mobile-bar .rsv { background: var(--aka); color: var(--shiro); }
     body { padding-bottom: calc(62px + env(safe-area-inset-bottom)); }
@@ -351,11 +372,11 @@
     .tanzaku:nth-child(3) { transform: rotate(-1deg); }
   }
   @media (max-width: 600px) {
-    .brand { font-size: 18px; }
+    .brand { font-size: var(--fs-lead); }
   }
   @media (max-width: 380px) {
-    .brand { font-size: 15px; }
-    .brand .maru { width: 24px; height: 24px; line-height: 25px; font-size: 13px; margin-right: 5px; }
+    .brand { font-size: var(--fs-body); }
+    .brand .maru { width: 24px; height: 24px; line-height: 25px; font-size: var(--fs-cap); margin-right: 5px; }
   }
 </style>
 </head>
