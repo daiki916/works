@@ -62,7 +62,10 @@
   --fs-lead: 18px;   /* リード                         比 1.22 */
   --fs-h3:   22px;   /* 実績名・約束名・手順名・屋号   比 1.27 */
   --fs-h2:   28px;   /* 節見出し（768px以上で40pxに）  */
-  --fs-display: clamp(36px, 8vw, 52px);  /* ヒーロー */
+  /* ヒーロー見出し。8vw は 450px 以下で下限を割るので、全スマホが 36px に張り付いていた。
+     短い屋号1語なら成立したが、約束の文へ差し替えると1行が画面から出る。
+     390px で 32px（1行10字＝320px）に収まる係数へ引き直す。比 1.14〜1.10 */
+  --fs-display: clamp(26px, 8.2vw, 44px);
   --fs-price:   clamp(36px, 9vw, 52px);  /* 価格の数字。本文とは別系統 */
 }
 
@@ -147,23 +150,62 @@ a:focus-visible,button:focus-visible{
 .c-btn--fill::before{background:var(--kinari)}
 .c-btn--fill:hover span,.c-btn--fill:focus-visible span{color:var(--ai)}
 
-/* ================= HERO ================= */
+/* ================= HERO =================
+   面は「のれんの布」そのもの。以前は平らな藍のテクスチャ（17KB）の上に、
+   同じ藍で描いたSVGののれんを重ねていた。実測すると布は地に対して
+   1.08〜1.37:1 しかなく、コンセプトの主役が見えていなかった。
+   商売が手渡すものを、正体が分かる距離で写す。 */
 .l-hero{
-  position:relative; min-height:100svh; display:flex; align-items:center;
-  background:var(--ai) url("../assets/noren/hero-ai.webp") center/cover no-repeat;
+  position:relative; isolation:isolate;
+  min-height:100svh; display:flex; align-items:center;
+  background-color:var(--ai-deep);
   color:var(--kinari); overflow:hidden;
 }
-.hero-noren-wrap{
-  position:absolute; right:-2%; top:0; width:min(48%,520px);
-  pointer-events:none; will-change:transform;
+/* 上下に 6% ずつ余らせて、視差で動かしても縁が出ないようにする */
+.hero-bg{position:absolute; inset:-6% 0; z-index:-2; will-change:transform}
+.hero-bg img{
+  width:100%; height:100%; object-fit:cover; object-position:center;
+  /* 沈めるのは乗算で。幕（アルファ）を厚くすると暗部が持ち上がり、
+     織り目と染めムラ＝写真を敷いた理由のほうが先に死ぬ */
+  filter:brightness(.72);
 }
-.hero-body{position:relative; z-index:1; padding:var(--sp-l) 0}
+/* 幕は文字が乗る側だけ。行灯の漏れ（右三分の一）は素通しにする。
+   実測で決めた配分。幕 .86＋乗算 .80 でも金の添え字は 4.97:1 だったが、
+   幕 .58＋乗算 .72 なら 5.05:1 と、薄い幕のほうが上回る。
+   アルファは暗部を持ち上げて全体を幕の色へ寄せるだけで、
+   最悪画素（＝いちばん明るい画素）はあまり下がらないため。 */
+.l-hero::before{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:
+    linear-gradient(96deg, rgba(15,36,56,.58) 0%, rgba(15,36,56,.40) 34%,
+                           rgba(15,36,56,.10) 64%, rgba(15,36,56,.02) 100%),
+    linear-gradient(to top, rgba(15,36,56,.50) 0%, rgba(15,36,56,0) 24%);
+}
+/* 左右は 0 にしない。`.c-wrap` の padding を後勝ちで打ち消してしまい、
+   広い画面では maxw の余白に隠れて気づかないが、スマホでは
+   文字が画面の左端にべたづけになる（実測 x=0）。 */
+.hero-body{position:relative; z-index:1; padding:var(--sp-l) var(--gutter)}
 .hero-eyebrow{font-size:var(--fs-cap); letter-spacing:.14em; color:var(--haku); margin-bottom:20px}
-.hero-title{font-family:var(--mincho); font-weight:700; font-size:var(--fs-display); line-height:1.15}
-.hero-promise{
-  margin-top:var(--sp-s); font-family:var(--mincho);
-  font-size:clamp(18px,3.4vw,22px); line-height:1.8; max-width:24em;
+/* 大きい字は「名前」ではなく「約束」。他の3サイトはどれも主張のほうが大きく、
+   ここだけ屋号が主役で、約束が18pxの添え文になっていた。
+   初めて来た人は名前を知らないので、順序が逆になっている。 */
+.hero-title{
+  font-family:var(--mincho); font-weight:700;
+  font-size:var(--fs-display); line-height:1.5;
+  text-shadow:0 2px 26px rgba(8,20,32,.5);
 }
+.hero-title .hero-line{display:block}
+.hero-title i{font-style:normal}
+/* 900px 以下は4行に積む。900〜768 で2行のままだと、2行目が 16字×44px＝704px
+   になり、器（幅-48）との差が十数pxしかない。スクロールバーの有無で
+   折り返しが起きるので、余裕のあるところまで積んでおく。 */
+@media (max-width:900px){ .hero-title i{display:block} }
+/* 屋号は署名として、金の罫のあとに置く（のれんに屋号を染め抜くのと同じ順序） */
+/* 罫はマスクの子（span）側に付ける。::before は `.c-mask>*` に一致しないので、
+   親に付けると罫だけ animation から外れて先に出てしまう。 */
+.hero-sign{margin-top:var(--sp-s); font-family:var(--mincho); font-size:var(--fs-h3); font-weight:700}
+.hero-sign>span{display:flex; align-items:center; gap:14px}
+.hero-sign>span::before{content:""; width:40px; height:1px; background:var(--haku); flex:none}
 .hero-cta{margin-top:var(--sp-m)}
 .hero-scroll{
   position:absolute; left:50%; bottom:28px; transform:translateX(-50%);
@@ -292,7 +334,9 @@ a:focus-visible,button:focus-visible{
   50%{transform:rotate(.3deg)}
   100%{transform:rotate(-.3deg)}
 }
-.hero-noren .c-noren-cloth{transform-origin:50% 6%; animation:noren-sway 90s linear infinite}
+/* ヒーローは写真になったので、揺れはフッターののれんが引き取る。
+   90秒／周＝気づかない速さ。速い常時アニメは作り物に見える。 */
+.footer-noren .c-noren-cloth{transform-origin:50% 6%; animation:noren-sway 90s linear infinite}
 
 /* ================= レスポンシブ ================= */
 @media (min-width:768px){
@@ -310,12 +354,31 @@ a:focus-visible,button:focus-visible{
 @media (max-width:767px){
   .values-figure{display:none}
   :root{--fs-h3:18px}   /* 名前系はスマホで一段落とす */
+}
 
-  /* スマホでは、のれんを画面上部いっぱいに掛けて、その下に文字を置く。
-     右上の小さな飾りではなく「くぐる一枚」として見せる。
-     中央寄せに transform を使わない（視差が transform を上書きするため）。 */
-  .hero-noren-wrap{right:0; left:0; margin:0 auto; width:min(88%,420px)}
-  .hero-body{padding:290px 0 110px}
+/* 縦画面のヒーロー。条件は「幅」ではなく「向き」（写真の出し分けと同じ条件）。
+   縦カットは行灯が高さ70%・布の下端が near-black。
+   文字は上半分の「広い静かな面」に置き、行灯は文字の下に残す。
+   下から灯りが覗いていることが、そのままスクロールの誘いになる。 */
+@media (orientation:portrait) and (max-width:900px){
+  .l-hero{align-items:flex-start}
+  .hero-body{padding:72px var(--gutter) 0}
+  /* 幕は上（文字の下）だけ濃く。中ほどは素通しで行灯を見せ、
+     最下端はスクロール案内のぶんだけ戻す */
+  .l-hero::before{
+    background:linear-gradient(to bottom,
+      rgba(15,36,56,.82) 0%, rgba(15,36,56,.66) 30%, rgba(15,36,56,.34) 48%,
+      rgba(15,36,56,.06) 64%, rgba(15,36,56,0) 76%, rgba(15,36,56,.46) 100%);
+  }
+  /* 縦カットは上端（鴨居＋光の当たった布）がいちばん明るく、
+     13px の金がここに乗る。横位置と同じ .72 では 4.29:1 で落ちる。 */
+  .hero-bg img{filter:brightness(.66)}
+}
+
+/* スマホを横に倒したとき。高さが足りないので詰めて2行に戻す */
+@media (orientation:landscape) and (max-height:520px){
+  .hero-body{padding:48px var(--gutter)}
+  .hero-title i{display:inline}
 }
 
 /* ================= 動きを減らす設定 ================= */
@@ -348,40 +411,33 @@ a:focus-visible,button:focus-visible{
 
 <!-- ============ HERO ============ -->
 <header class="l-hero" id="top">
-  <div class="hero-noren-wrap">
-    <svg class="c-noren hero-noren" viewBox="0 0 400 320" aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="nCloth" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#2a4a72"/>
-          <stop offset=".5" stop-color="#1b3652"/>
-          <stop offset="1" stop-color="#0f2437"/>
-        </linearGradient>
-        <linearGradient id="nFold" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#0a1926" stop-opacity="0"/>
-          <stop offset=".5" stop-color="#0a1926" stop-opacity=".4"/>
-          <stop offset="1" stop-color="#0a1926" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <rect class="c-noren-rod" x="2" y="14" width="396" height="7" rx="3.5"/>
-      <g class="c-noren-cloth">
-        <g fill="url(#nCloth)">
-          <path d="M18 20h112v272c0 5-4 9-9 9H27c-5 0-9-4-9-9z"/>
-          <path d="M146 20h108v272c0 5-4 9-9 9h-90c-5 0-9-4-9-9z"/>
-          <path d="M270 20h112v272c0 5-4 9-9 9h-94c-5 0-9-4-9-9z"/>
-        </g>
-        <g fill="url(#nFold)">
-          <rect x="60" y="20" width="28" height="278"/>
-          <rect x="186" y="20" width="28" height="278"/>
-          <rect x="312" y="20" width="28" height="278"/>
-        </g>
-      </g>
-    </svg>
+  <div class="hero-bg" aria-hidden="true">
+    <picture>
+      <!-- 縦画面には縦位置の別カットを渡す。横位置を cover で流すと、
+           戸枠・隙間・行灯という構図が「布の拡大」になって全部消える。
+           出し分けは幅ではなく向きで決める。768px幅の縦画面（タブレット縦）でも
+           横位置は幅の42%しか映らず、構図が消える基準（65%）を大きく割る。 -->
+      <source media="(orientation:portrait) and (max-width:900px)"
+              srcset="../assets/noren/hero-noren-v-560.webp 560w,
+                      ../assets/noren/hero-noren-v-768.webp 768w"
+              sizes="100vw" width="768" height="1376">
+      <img src="../assets/noren/hero-noren-1376.webp"
+           srcset="../assets/noren/hero-noren-880.webp 880w,
+                   ../assets/noren/hero-noren-1376.webp 1376w"
+           sizes="100vw" width="1376" height="768"
+           alt="" fetchpriority="high" decoding="async">
+    </picture>
   </div>
 
   <div class="c-wrap hero-body">
     <p class="hero-eyebrow c-mask js-seq"><span>飲食店専門 ／ ホームページ制作</span></p>
-    <h1 class="hero-title c-mask js-seq"><span>元店長だいき</span></h1>
-    <p class="hero-promise c-mask js-seq"><span>のれんを掛けてきた人間が、<br>お店のホームページをつくります。</span></p>
+    <h1 class="hero-title">
+      <!-- <i> はスマホでだけ改行する単位。折り位置を機械に任せず、
+           文節（のれんを掛けてきた／人間が）で固定する -->
+      <span class="hero-line c-mask js-seq"><span><i>のれんを掛けてきた</i><i>人間が、</i></span></span>
+      <span class="hero-line c-mask js-seq"><span><i>お店のホームページを</i><i>つくります。</i></span></span>
+    </h1>
+    <p class="hero-sign c-mask js-seq"><span>元店長だいき</span></p>
     <div class="hero-cta c-mask js-seq">
       <a class="c-btn c-btn--light" href="#contact"><span>ご相談はこちら</span></a>
     </div>
@@ -680,11 +736,12 @@ window.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <!-- のれんの視差。以前は GSAP を読んでいたが、この一箇所のために 116KB は割に合わない。
-     やることは transform を1つ動かすだけなので、標準の機能で足りる。 -->
+     やることは transform を1つ動かすだけなので、標準の機能で足りる。
+     動かす量は上下の余り（±6%）の内側に収める。超えると縁が出る。 -->
 <script>
 window.addEventListener('load', function () {
   if (!document.documentElement.classList.contains('js-anim')) return;
-  var wrap = document.querySelector('.hero-noren-wrap');
+  var wrap = document.querySelector('.hero-bg');
   var hero = document.querySelector('.l-hero');
   if (!wrap || !hero) return;
 
@@ -694,7 +751,8 @@ window.addEventListener('load', function () {
     var h = hero.offsetHeight;
     if (!h) return;
     var y = Math.min(Math.max(window.pageYOffset, 0), h);
-    wrap.style.transform = 'translate3d(0,' + (y / h * 14).toFixed(2) + '%,0)';
+    // 余りは上下 6% ずつ＝要素高さの約 5.36%。最大 4% までに留めて縁を出さない。
+    wrap.style.transform = 'translate3d(0,' + (y / h * 4).toFixed(2) + '%,0)';
   }
   window.addEventListener('scroll', function () {
     if (!ticking) { ticking = true; requestAnimationFrame(update); }

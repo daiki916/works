@@ -1,5 +1,8 @@
-# 架空店舗のデモサイト。検索結果に出さない。
-# Restaurantの構造化データに架空の住所・電話が入っているため、
-# インデックスされると実在の店を探している人の検索を汚す。
+# 架空店舗のデモサイト。検索結果には出さないが、
+# X のリンクカード生成に必要な範囲は Twitterbot に許可する。
+User-agent: Twitterbot
+Allow: /noren/
+Allow: /assets/noren/
+
 User-agent: *
 Disallow: /

@@ -2,6 +2,14 @@
 # 制作ログ・OJOワークスペース・内部ツールを事故で公開しないため。
 /*
 !/.gitignore
+!/.openai/
+!/app/
+!/scripts/
+!/package.json
+!/package-lock.json
+!/next.config.ts
+!/tsconfig.json
+!/vite.config.ts
 !/index.html
 !/robots.txt
 !/assets/
@@ -14,6 +22,13 @@
 # フォントのサブセット生成スクリプト。公開先に置かれるが、
 # 失うと woff2 を作り直せなくなるので必ずバージョン管理に入れる
 !/tools/
+
+# Sites のローカル生成物（公開アーカイブには build 後の dist だけを含める）
+/node_modules/
+/public/
+/dist/
+/.next/
+/.wrangler/
 
 # 加工前の元画像バックアップ。許可した公開ディレクトリの中にあっても外に出さない
 *.orig
