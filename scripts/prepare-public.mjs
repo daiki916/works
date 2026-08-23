@@ -5,7 +5,6 @@ import { sanitizeDemo3Html } from './sanitize-demo3.mjs';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const publicRoot = join(projectRoot, 'public');
-const publishedRoot = join(publicRoot, '_published');
 const staticPages = [
   'noren',
   'demo1-toriai',
@@ -26,28 +25,20 @@ const entries = [
   'demo5-kobiki',
 ];
 
+await sanitizeDemo3Html(join(projectRoot, 'demo3-shoku', 'index.html'));
+
 await rm(publicRoot, { recursive: true, force: true });
-await mkdir(publishedRoot, { recursive: true });
+await mkdir(publicRoot, { recursive: true });
 await cp(join(projectRoot, '_headers'), join(publicRoot, '_headers'));
 
 for (const entry of entries) {
-  await cp(join(projectRoot, entry), join(publishedRoot, entry), {
+  await cp(join(projectRoot, entry), join(publicRoot, entry), {
     recursive: true,
   });
 }
 
-await cp(
-  join(publishedRoot, 'index.html'),
-  join(publishedRoot, 'root.payload'),
-);
-await rm(join(publishedRoot, 'index.html'));
+await rm(join(publicRoot, 'index.html'));
 
 for (const page of staticPages) {
-  await cp(
-    join(publishedRoot, page, 'index.html'),
-    join(publishedRoot, `${page}.payload`),
-  );
-  await rm(join(publishedRoot, page, 'index.html'));
+  await rm(join(publicRoot, page, 'index.html'));
 }
-
-await sanitizeDemo3Html(join(publishedRoot, 'demo3-shoku.payload'));

@@ -31,51 +31,21 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   async headers() {
     return [
-      ...staticPages.map((page) => ({
-        source: `/${page}/index.html`,
-        headers: [
-          ...securityHeaders,
-          { key: 'Content-Type', value: 'text/html; charset=utf-8' },
-        ],
-      })),
       {
         source: '/:path*',
         headers: securityHeaders,
       },
     ];
   },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/assets/:path*',
-          destination: '/_published/assets/:path*',
-        },
-        ...staticPages.map((page) => ({
-          source: `/${page}/index.html`,
-          destination: `/_published/${page}.payload`,
-        })),
-        ...staticPages.map((page) => ({
-          source: `/${page}/:path*`,
-          destination: `/_published/${page}/:path*`,
-        })),
-        {
-          source: '/index.html',
-          destination: '/_published/root.payload',
-        },
-        {
-          source: '/robots.txt',
-          destination: '/_published/robots.txt',
-        },
-      ],
-      afterFiles: [],
-      fallback: [],
-    };
-  },
   async redirects() {
     return [
       {
         source: '/',
+        destination: '/noren/index.html#works',
+        permanent: false,
+      },
+      {
+        source: '/index.html',
         destination: '/noren/index.html#works',
         permanent: false,
       },

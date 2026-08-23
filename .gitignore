@@ -5,6 +5,7 @@
 !/.openai/
 !/app/
 !/scripts/
+!/types/
 !/package.json
 !/package-lock.json
 !/next.config.ts

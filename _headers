@@ -6,6 +6,3 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-
-/_published/*.payload
-  Content-Type: text/html; charset=utf-8
