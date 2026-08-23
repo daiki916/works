@@ -59,15 +59,28 @@
   --gothic: "Noto Sans JP", sans-serif;
   --mono: ui-monospace, "SFMono-Regular", "Roboto Mono", Menlo, Consolas, monospace;
 
-  /* 型スケール：見出しは3段しか持たない */
-  /* ヒーローは面で押すので、見出しも幅を使い切るところまで上げる（上限68→92px）。
-     この結果「いちばん下手な状態です。」は1行に収まらなくなった（12字×92px＝1104px＞1020px）。
-     旧版のコメントは「375pxでも1280pxでも1行に収まる」と書いてあったが、
-     それは上限68pxのときの話で、いまは成り立たない。
-     2行に折れる前提に切り替え、字下げの段違いは外した（下の .l2 を参照） */
+  /* 型スケール。本文15pxを基準に、隣り合う段の比をすべて 1.1 以上にする。
+     直す前は 10 / 10.5 / 11 / 12 / 12.5 / 13 / 13.5 と、3.5pxの幅に7段が密集していた。
+     10 と 10.5 の差は読者に見えない。見えない差は設計ではなく、迷って手が止まった跡。
+     要素を足すたびに「ここは少し小さく」を繰り返すとこうなる。
+     以後、新しい要素には必ずこの中から選ぶ。選べないなら役割が曖昧だということ。 */
+  --fs-cap:   11px;   /* 極小の添え字（ロゴの読み・木口注記・読み上げ用） 比 1.18 */
+  --fs-note:  13px;   /* ラベル・キャプション・メタ・ナビ           比 1.15 */
+  --fs-body:  15px;   /* 本文・ボタン                              比 1.13 */
+  --fs-lead:  17px;   /* リード                                    比 1.18 */
+  --fs-h3:    20px;   /* 小見出し・ロゴ・屋号                      比 1.20 */
+  --fs-h2:    clamp(24px, 3vw, 31px);   /* 節見出し */
+  /* ヒーローは面で押すので、見出しだけ幅を使い切るところまで上げる（上限92px）。
+     この結果「いちばん下手な状態です。」は1行に収まらない（12字×92px＝1104px＞1020px）ので、
+     2行に折れる前提に切り替え、字下げの段違いは外してある（下の .l2 を参照）。
+     6.4vw は390px幅で25pxにしかならず下限に張り付くため、縦画面は別係数で上書きする */
   --fs-display: clamp(28px, 6.4vw, 92px);
-  --fs-h2:      clamp(21px, 3vw, 31px);
-  --fs-h3:      17px;
+
+  /* 数字は本文と別系統。大きな数字＋小さな単位で「主張」ではなく「事実」を作る役割なので、
+     文章の段に混ぜると両方が濁る */
+  --fs-num:   30px;                    /* 節の中の数字 */
+  --fs-num-l: 44px;                    /* 記録票の数字 */
+  --fs-num-x: clamp(44px, 7vw, 82px);  /* 経年の年数 */
 
   /* 動きのトークン。easing は3種類まで */
   --ease-out-quart:   cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -90,7 +103,7 @@ body {
   font-family: var(--gothic);
   background: var(--shikkui);
   color: var(--sumi);
-  font-size: 15px;
+  font-size: var(--fs-body);
   line-height: 1.9;
   letter-spacing: .02em;
   /* 和文の中割れ対策。サイト全体に1本で入れる */
@@ -112,7 +125,7 @@ h1, h2, h3 { font-family: var(--mincho); font-weight: 500; letter-spacing: norma
 /* 欧文の小ラベルだけ字間を開ける */
 .label {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--fs-cap);
   letter-spacing: .3em;
   text-transform: uppercase;
   color: var(--ao);
@@ -175,9 +188,9 @@ body::before {
 .is-dark .c-header { color: var(--kinari); }
 .is-dark .c-header::before { background: var(--yami); }
 
-.c-logo { font-family: var(--mincho); font-size: 18px; text-decoration: none; }
-.c-logo small { font-family: var(--mono); font-size: 10px; letter-spacing: .24em; opacity: .6; display: block; margin-top: 2px; }
-.c-nav { display: flex; align-items: center; gap: 22px; font-size: 13px; }
+.c-logo { font-family: var(--mincho); font-size: var(--fs-h3); text-decoration: none; }
+.c-logo small { font-family: var(--mono); font-size: var(--fs-cap); letter-spacing: .24em; opacity: .6; display: block; margin-top: 2px; }
+.c-nav { display: flex; align-items: center; gap: 22px; font-size: var(--fs-note); }
 .c-nav a { text-decoration: none; }
 .c-nav a:not(.c-cta) { position: relative; }
 /* 当たり判定だけ 44px に広げる。文字の高さは 25px しかなく、タブレットでは指に薄い。
@@ -295,7 +308,7 @@ body::before {
 .hero-head .l2 { text-indent: 0; }
 .hero-lead {
   color: var(--usu);
-  font-size: 16px;
+  font-size: var(--fs-lead);
   line-height: 2;
   letter-spacing: .03em;
   max-width: 42ch;
@@ -304,7 +317,7 @@ body::before {
   position: relative;
   margin-top: var(--sp-l); padding-top: 14px;
   display: flex; flex-wrap: wrap; gap: var(--sp-s) 36px;
-  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--usu);
+  font-family: var(--mono); font-size: var(--fs-note); letter-spacing: .08em; color: var(--usu);
 }
 /* 罫線は引かれてから文字が立つ。no-JSでは最初から引いてある */
 .hero-meta::before {
@@ -320,7 +333,7 @@ body::before {
 .btn {
   position: relative; overflow: hidden;
   display: inline-flex; align-items: center; min-height: 52px;
-  padding: 0 30px; text-decoration: none; font-size: 13.5px; letter-spacing: .06em;
+  padding: 0 30px; text-decoration: none; font-size: var(--fs-body); letter-spacing: .06em;
   border: 1px solid var(--sumi);
   transition: background-color 200ms linear, color 200ms linear,
               border-color 200ms linear,
@@ -430,7 +443,7 @@ body::before {
 }
 .koguchi-note {
   margin-top: var(--sp-s);
-  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--usu);
+  font-family: var(--mono); font-size: var(--fs-cap); letter-spacing: .1em; color: var(--usu);
   text-align: right;
 }
 /* ヒーローが暗くなったので、添え書きも漆喰側へ */
@@ -442,7 +455,7 @@ body::before {
   .koguchi-note {
     position: absolute; top: 6px; right: -30px; margin-top: 0;
     writing-mode: vertical-rl; text-align: left;
-    font-size: 10.5px; letter-spacing: .18em;
+    font-size: var(--fs-cap); letter-spacing: .18em;
   }
   .koguchi-note b { text-combine-upright: all; }
 }
@@ -463,7 +476,7 @@ section { padding-block: var(--sp-x); }
 }
 .s-gaikan figcaption {
   padding-top: var(--sp-s);
-  font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: var(--usu);
+  font-family: var(--mono); font-size: var(--fs-cap); letter-spacing: .06em; color: var(--usu);
 }
 
 /* ── 矩計図の隣に置く実物写真 ─────────────────────── */
@@ -473,7 +486,7 @@ section { padding-block: var(--sp-x); }
   aspect-ratio: 4 / 3; object-fit: cover; background: var(--kei);
 }
 .kabe-photo figcaption {
-  margin-top: var(--sp-s); font-size: 13px; color: var(--usu); max-width: 44ch;
+  margin-top: var(--sp-s); font-size: var(--fs-note); color: var(--usu); max-width: 44ch;
 }
 
 /* ── 見学会カードの写真（カード幅いっぱいに抜く） ───── */
@@ -508,7 +521,7 @@ section { padding-block: var(--sp-x); }
 /* 経過年数。袋文字にして、写真の邪魔をせず数だけ立たせる */
 .keinen-year {
   font-family: var(--mono);
-  font-size: clamp(44px, 7vw, 82px);
+  font-size: var(--fs-num-x);
   line-height: .85; letter-spacing: -.02em;
   color: transparent;
   -webkit-text-stroke: 1.5px var(--yami-bun);
@@ -585,7 +598,7 @@ section { padding-block: var(--sp-x); }
   border-top: 1px solid var(--kei);
 }
 .shigoto-item:last-child { border-bottom: 1px solid var(--kei); }
-.shigoto-no { font-family: var(--mono); font-size: 12px; letter-spacing: .16em; color: var(--ao); padding-top: 6px; }
+.shigoto-no { font-family: var(--mono); font-size: var(--fs-note); letter-spacing: .16em; color: var(--ao); padding-top: 6px; }
 .shigoto-item h3 { font-size: var(--fs-h3); margin-bottom: var(--sp-s); }
 .shigoto-item p { color: var(--usu); max-width: 44ch; }
 .shigoto-item p + p { margin-top: .9em; }
@@ -602,14 +615,14 @@ section { padding-block: var(--sp-x); }
   font-family: var(--mincho); color: var(--ao);
   display: flex; align-items: baseline; gap: 5px; line-height: 1;
 }
-.shigoto-rec-num b { font-size: 44px; font-weight: 400; letter-spacing: .01em; }
-.shigoto-rec-num span { font-size: 13px; }
-.shigoto-rec-cap { font-family: var(--gothic); font-size: 12px; color: var(--usu); margin-top: 8px; }
+.shigoto-rec-num b { font-size: var(--fs-num-l); font-weight: 400; letter-spacing: .01em; }
+.shigoto-rec-num span { font-size: var(--fs-note); }
+.shigoto-rec-cap { font-family: var(--gothic); font-size: var(--fs-note); color: var(--usu); margin-top: 8px; }
 .shigoto-rec dl { margin-top: var(--sp-m); border-top: 1px solid var(--kei); }
 .shigoto-rec div {
   display: flex; justify-content: space-between; gap: 10px;
   padding: 8px 0; border-bottom: 1px solid var(--kei);
-  font-family: var(--mono); font-size: 12px; line-height: 1.6;
+  font-family: var(--mono); font-size: var(--fs-note); line-height: 1.6;
 }
 .shigoto-rec dt { color: var(--usu); white-space: nowrap; }
 .shigoto-rec dd { color: var(--sumi); text-align: right; }
@@ -646,9 +659,9 @@ section { padding-block: var(--sp-x); }
   transition: background-color 200ms linear;
 }
 .kabe-list li b { font-weight: 500; }
-.kabe-list li em { display: block; font-style: normal; font-size: 12.5px; color: var(--usu); letter-spacing: .04em; }
+.kabe-list li em { display: block; font-style: normal; font-size: var(--fs-note); color: var(--usu); letter-spacing: .04em; }
 .kabe-list li var {
-  font-family: var(--mono); font-style: normal; font-size: 12px;
+  font-family: var(--mono); font-style: normal; font-size: var(--fs-note);
   letter-spacing: .06em; color: var(--ao); white-space: nowrap;
 }
 .kabe-list li.is-lit { background: rgba(46,74,84,.07); }
@@ -664,9 +677,9 @@ section { padding-block: var(--sp-x); }
   border: 1px solid var(--kei);
 }
 .suuji div { background: var(--shikkui); padding: var(--sp-m) var(--sp-m) 26px; }
-.suuji dt { font-size: 12.5px; color: var(--usu); letter-spacing: .06em; margin-bottom: 10px; }
-.suuji dd { font-family: var(--mono); font-size: 30px; line-height: 1.2; letter-spacing: -.01em; }
-.suuji dd small { font-family: var(--gothic); font-size: 13px; letter-spacing: .06em; margin-left: 4px; color: var(--usu); }
+.suuji dt { font-size: var(--fs-note); color: var(--usu); letter-spacing: .06em; margin-bottom: 10px; }
+.suuji dd { font-family: var(--mono); font-size: var(--fs-num); line-height: 1.2; letter-spacing: -.01em; }
+.suuji dd small { font-family: var(--gothic); font-size: var(--fs-note); letter-spacing: .06em; margin-left: 4px; color: var(--usu); }
 
 /* ── 向いていないこと ─────────────────────────────── */
 .s-muki { background: var(--yami); color: var(--kinari); }
@@ -684,7 +697,7 @@ section { padding-block: var(--sp-x); }
   content: "×"; position: absolute; left: 0; top: 20px;
   font-family: var(--mono); color: #7FA3AE;
 }
-.muki li em { font-style: normal; display: block; margin-top: 6px; font-size: 13.5px; color: var(--yami-bun); }
+.muki li em { font-style: normal; display: block; margin-top: 6px; font-size: var(--fs-note); color: var(--yami-bun); }
 
 /* ── 見学会 ───────────────────────────────────────── */
 .kengaku { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-m); }
@@ -694,27 +707,31 @@ section { padding-block: var(--sp-x); }
   transition: border-color 200ms linear;
 }
 .kengaku article:hover { border-color: var(--ao); }
-.kengaku .date { font-family: var(--mono); font-size: 13px; letter-spacing: .08em; color: var(--ao); }
+.kengaku .date { font-family: var(--mono); font-size: var(--fs-note); letter-spacing: .08em; color: var(--ao); }
 .kengaku h3 { font-size: var(--fs-h3); }
-.kengaku p { font-size: 13.5px; color: var(--usu); }
+.kengaku p { font-size: var(--fs-body); color: var(--usu); }
 .kengaku .btn { margin-top: auto; align-self: flex-start; }
 
 /* ── フッター ─────────────────────────────────────── */
 .c-footer { border-top: 1px solid var(--kei); padding-block: var(--sp-l) var(--sp-m); }
 .foot-grid { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-m); align-items: start; }
-.foot-name { font-family: var(--mincho); font-size: 20px; margin-bottom: var(--sp-s); }
-.foot-info { font-size: 13.5px; color: var(--usu); line-height: 2.1; }
+.foot-name { font-family: var(--mincho); font-size: var(--fs-h3); margin-bottom: var(--sp-s); }
+.foot-info { font-size: var(--fs-note); color: var(--usu); line-height: 2.1; }
 .foot-info span { display: inline-block; }
 /* 指で押す領域は 44px を下回らせない */
 .foot-back {
   display: inline-flex; align-items: center; min-height: 44px;
-  font-size: 13px; text-decoration: none;
+  font-size: var(--fs-note); text-decoration: none;
   box-shadow: inset 0 -1px 0 var(--kei);
 }
 .foot-note {
   margin-top: var(--sp-l); padding-top: var(--sp-m);
   border-top: 1px solid var(--kei);
-  font-size: 12px; color: var(--usu); line-height: 1.9;
+  font-size: var(--fs-note); color: var(--usu); line-height: 1.9;
+  /* 実測で1行55字あった。和文が読めるのは25〜40字で、40字を超えると目が行頭に戻れない。
+     器（1020px）の幅は行長の上限ではない。em はそのまま字数になるので em で切る。
+     フッターの注記は「短いから大丈夫」と思って max-width を入れ忘れる典型 */
+  max-width: 34em;
 }
 /* ページ全体で 700 を使っているのはここの 11 文字だけだった。
    そのために和文ウェイトを1本まるごと落とすのは割に合わない。
@@ -760,7 +777,7 @@ section { padding-block: var(--sp-x); }
 .keinen-static .keinen-step .sr-only {
   position: static; width: auto; height: auto; margin: 0 0 6px;
   clip-path: none; overflow: visible; display: block;
-  font-family: var(--mono); font-size: 11px; letter-spacing: .16em; color: #7FA3AE;
+  font-family: var(--mono); font-size: var(--fs-cap); letter-spacing: .16em; color: #7FA3AE;
 }
 
 </style>
