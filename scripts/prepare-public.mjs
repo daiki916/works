@@ -5,8 +5,8 @@ import { sanitizeDemo3Html } from './sanitize-demo3.mjs';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const publicRoot = join(projectRoot, 'public');
+const publishedRoot = join(publicRoot, '_published');
 const entries = [
-  '_headers',
   'index.html',
   'robots.txt',
   'assets',
@@ -19,12 +19,13 @@ const entries = [
 ];
 
 await rm(publicRoot, { recursive: true, force: true });
-await mkdir(publicRoot, { recursive: true });
+await mkdir(publishedRoot, { recursive: true });
+await cp(join(projectRoot, '_headers'), join(publicRoot, '_headers'));
 
 for (const entry of entries) {
-  await cp(join(projectRoot, entry), join(publicRoot, entry), {
+  await cp(join(projectRoot, entry), join(publishedRoot, entry), {
     recursive: true,
   });
 }
 
-await sanitizeDemo3Html(join(publicRoot, 'demo3-shoku', 'index.html'));
+await sanitizeDemo3Html(join(publishedRoot, 'demo3-shoku', 'index.html'));

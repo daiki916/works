@@ -37,6 +37,30 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/assets/:path*',
+          destination: '/_published/assets/:path*',
+        },
+        ...staticPages.map((page) => ({
+          source: `/${page}/:path*`,
+          destination: `/_published/${page}/:path*`,
+        })),
+        {
+          source: '/index.html',
+          destination: '/_published/index.html',
+        },
+        {
+          source: '/robots.txt',
+          destination: '/_published/robots.txt',
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async redirects() {
     return [
       {
