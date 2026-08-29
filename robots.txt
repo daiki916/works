@@ -1,6 +1,10 @@
 # 架空店舗のデモサイト。検索結果には出さないが、
-# X のリンクカード生成に必要な範囲は Twitterbot に許可する。
+# X と Meta系(Instagram/Facebook のDMリンクカード生成)に必要な範囲だけ許可する。
 User-agent: Twitterbot
+Allow: /noren/
+Allow: /assets/noren/
+
+User-agent: facebookexternalhit
 Allow: /noren/
 Allow: /assets/noren/
 
